@@ -26,12 +26,13 @@ var (
   
   cmdText = `
     * help - See all the current commands you can run.
-    * about - Who is HackermonDev? Learn more with this command
-    * clear - Clear the screen`
+    * about - Who is HackermonDev? Learn more with this command.
+    * clear - Clears the screen.
+`
 )
 
 func HelpCmd(stream io.Writer, name string, args []string) {
-	utils.Type(stream, fmt.Sprintf("%sdaniel.is-a.dev%s\n\nCommands: %s", colors.Yellow, colors.Reset, cmdText))
+	utils.AddText(stream, fmt.Sprintf("%shttps://daniel.is-a.dev%s\n\nCommands: %s", colors.Yellow, colors.Reset, cmdText))
 }
 
 func AboutMeCmd(stream io.Writer, name string, args []string){
@@ -47,6 +48,11 @@ func ClearCmd(stream io.Writer, name string, args []string){
 
 func RunCommand(stream io.Writer, text string) {
 	cmdName := strings.Split(text, " ")[0]
+
+  if cmdName == ""{
+    return
+  }
+
 	cmdArgs := strings.Split(text, " ")
 
 	if len(cmdArgs) > 1 {
@@ -64,7 +70,7 @@ func RunCommand(stream io.Writer, text string) {
 		}
 	}
 
-	if foundCommandToRun == false {
+	if foundCommandToRun == false { 
 		utils.Type(stream, fmt.Sprintf("%sThe command \"%s\" was not found on the server.\n", colors.Red, cmdName))
 	}
 }

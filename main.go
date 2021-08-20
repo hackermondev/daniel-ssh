@@ -14,7 +14,7 @@ import (
 
 
 func CloseServerHandler(s ssh.Session){
-  utils.Type(s, "\nGoodbye.\n")
+  s.Exit(0)
 
   log.Println(fmt.Sprintf("connection from %s closed.", s.RemoteAddr()))
 }
@@ -39,7 +39,7 @@ func StartServer(port string) {
         break
       }
 
-      commands.RunCommand(s, command)
+      commands.RunCommand(term, command)
       log.Println(fmt.Sprintf("%s ran command %s %s", s.RemoteAddr(), command, colors.Reset))
 
     }
