@@ -5,11 +5,15 @@ import (
 
 	"fmt"
 	"io"
+
 	"sshserver/colors"
 	"sshserver/utils"
+  "sshserver/api"
+
 	"strings"
 
   "time"
+  "log"
 )
 
 type cmd struct {
@@ -36,10 +40,21 @@ func HelpCmd(stream io.Writer, name string, args []string) {
 }
 
 func AboutMeCmd(stream io.Writer, name string, args []string){
-  utils.Type(stream, fmt.Sprintf("Who is HackermonDev??? 🤔🤔🤔"))
+  utils.Type(stream, fmt.Sprintf("Who is HackermonDev??? 🤔🤔🤔\n\n"))
 
-  time.Sleep(3)
-  utils.Type(stream, fmt.Sprintf("Ok"))
+  aboutMe, err := api.GetAboutMeDescription()
+
+  if err != nil{
+    log.Println(err)
+
+    utils.Type(stream, fmt.Sprintf("An unexpected error occured. Please contact Hackermon if this error persits."))
+
+    return
+  }
+
+  time.Sleep(1 * time.Second)
+  utils.Type(stream, fmt.Sprintf(aboutMe))
+  utils.AddText(stream, "\n\n")
 }
 
 func ClearCmd(stream io.Writer, name string, args []string){
@@ -71,6 +86,6 @@ func RunCommand(stream io.Writer, text string) {
 	}
 
 	if foundCommandToRun == false { 
-		utils.Type(stream, fmt.Sprintf("%sThe command \"%s\" was not found on the server.\n", colors.Red, cmdName))
+		utils.AddText(stream, fmt.Sprintf("%sThe command \"%s\" was not found on the server.\n", colors.Red, cmdName))
 	}
 }
