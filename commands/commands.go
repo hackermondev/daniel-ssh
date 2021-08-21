@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	"github.com/tj/go-spin"
-	"jaytaylor.com/html2text"
 
 	"log"
 	"time"
@@ -145,7 +144,7 @@ func BlogsCmd(stream io.Writer, name string, args []string, session ssh.Session)
 			utils.Type(stream, fmt.Sprintf("%s The blog ID you specified was not found. %s", colors.Red, colors.Reset))
 		}
 
-		text, err := html2text.FromString(blog.Data, html2text.Options{PrettyTables: true})
+		text := utils.RenderMarkdownTerminal(blog.Data)
 
 		if err != nil {
 			log.Println(err)
@@ -155,16 +154,15 @@ func BlogsCmd(stream io.Writer, name string, args []string, session ssh.Session)
 			return
 		}
 
-		utils.AddText(stream, fmt.Sprintf(`
-    %s %s %s 
-    --------------------------
+		utils.AddText(stream, fmt.Sprintf(`%s %s %s 
+
+--------------------------
+%s %s
+--------------------------
+%s
     
-    %s %s
-    
-    --------------------------
-    %s
-    
-    `, colors.Green, blog.Title, colors.Reset, colors.Gray, text, colors.Reset))
+%s On terminal, the markdown and pictures may not be rendered correctly. To see the full blog post go to https://daniel.is-a.dev/blog/%s %s
+`, colors.Green, blog.Title, colors.Reset, colors.Gray, text, colors.Reset, colors.Red, blog.Slug, colors.Reset))
 		return
 	}
 

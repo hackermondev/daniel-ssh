@@ -27,7 +27,7 @@ type Blog struct{
   Id int `json:id`
   Title string `json:title`
   Teaser string `json:teaser`
-  Data string `json:html_content`
+  Data string `json:data`
   Slug string `json:slug`
   ViewCount int `json:viewCount`
   PublishedAt string `json:publishedAt`

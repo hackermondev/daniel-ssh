@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/term"
 
+  "time"
 	_ "image/png"
 
 	"github.com/qeesung/image2ascii/convert"
@@ -43,7 +44,12 @@ func StartServer(port string) {
 
 		logoAscii := converter.ImageFile2ASCIIString("assets/hackermon.png", &convertOptions)
 
-		utils.AddText(s, logoAscii)
+    utils.AddText(s, "Loading...\n")
+		utils.AddText(s, logoAscii) 
+    utils.AddText(s, "Loading...\n")
+
+    time.Sleep(1 * time.Second)
+    utils.ClearTerm(s)
 
 		utils.Type(s, fmt.Sprintf("%sWelcome to %sdaniel.is-a.dev%s! Type %shelp%s to get started.%s\n\n", colors.Green, colors.Yellow, colors.Green, colors.Yellow, colors.Green, colors.Reset))
 

@@ -5,7 +5,16 @@ import (
 	"io"
 	"strings"
   "time"
+
+  markdownP "github.com/MichaelMure/go-term-markdown"
 )
+
+
+func RenderMarkdownTerminal(markdown string) string{
+  result := markdownP.Render(markdown, 80, 6)
+
+  return string(result)
+}
 
 func Type(w io.Writer, content string ) {
 	chars := strings.Split(content, "")

@@ -3,6 +3,7 @@ module sshserver
 go 1.14
 
 require (
+	github.com/MichaelMure/go-term-markdown v0.1.4
 	github.com/aybabtme/rgbterm v0.0.0-20170906152045-cc83f3b3ce59 // indirect
 	github.com/gliderlabs/ssh v0.3.3
 	github.com/mattn/go-isatty v0.0.13 // indirect
