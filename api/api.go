@@ -1,11 +1,11 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
-  "encoding/json"
 )
 
 var (
@@ -19,22 +19,30 @@ var (
 	}
 
 	HTTPClient = &http.Client{
-    Transport: HTTPTransport,
-  }
+		Transport: HTTPTransport,
+	}
 )
 
-type Blog struct{
-  Id int `json:id`
-  Title string `json:title`
-  Teaser string `json:teaser`
-  Data string `json:data`
-  Slug string `json:slug`
-  ViewCount int `json:viewCount`
-  PublishedAt string `json:publishedAt`
+type Blog struct {
+	Id          int    `json:id`
+	Title       string `json:title`
+	Teaser      string `json:teaser`
+	Data        string `json:data`
+	Slug        string `json:slug`
+	ViewCount   int    `json:viewCount`
+	PublishedAt string `json:publishedAt`
 }
 
 func GetAboutMeDescription() (string, error) {
-	resp, err := HTTPClient.Get(fmt.Sprintf("%s/about", BaseAPIURL))
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/about", BaseAPIURL), nil)
+
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("User-Agent", "daniel-ssh")
+
+	resp, err := HTTPClient.Do(req)
 
 	if err != nil {
 		return "", err
@@ -50,8 +58,16 @@ func GetAboutMeDescription() (string, error) {
 	return string(body), nil
 }
 
-func GetBlogs() ([]Blog, error){
- resp, err := HTTPClient.Get(fmt.Sprintf("%s/blog/api", BaseURL))
+func GetBlogs() ([]Blog, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/blog/api", BaseURL), nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("User-Agent", "daniel-ssh")
+
+	resp, err := HTTPClient.Do(req)
 
 	if err != nil {
 		return nil, err
@@ -65,11 +81,11 @@ func GetBlogs() ([]Blog, error){
 		return nil, err
 	}
 
-  var data []Blog
+	var data []Blog
 
-  if err := json.Unmarshal(body, &data); err != nil {
-    return nil, err
-  }
-    
-	return data, nil 
+	if err := json.Unmarshal(body, &data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
