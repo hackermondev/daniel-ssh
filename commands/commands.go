@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 
+  "github.com/gliderlabs/ssh"
+
 	"sshserver/api"
 	"sshserver/colors"
 	"sshserver/utils"
@@ -22,7 +24,7 @@ import (
 
 type cmd struct {
 	name     string
-	run      func(stream io.Writer, name string, args []string)
+	run      func(stream io.Writer, name string, args []string, session ssh.Session)
 	argsInfo string
 }
 
@@ -31,21 +33,25 @@ var (
 		{"help", HelpCmd, ""},
 		{"about", AboutMeCmd, ""},
 		{"clear", ClearCmd, ""},
-		{"blogs", BlogsCmd, ""}}
+		{"blogs", BlogsCmd, ""},
+    {"echo", EchoCmd, "<text>"},
+    {"exit", ExitCmd, ""}}
 
 	cmdText = `
     * help - See all the current commands you can run.
     * about - Who is HackermonDev? Learn more with this command.
     * clear - Clears the screen.
-    * blogs - Read my blogs
+    * blogs - Read my blogs from SSH.
+    * echo <text> - The server will echo the text you specified.
+    * exit - Exit the SSH session.
 `
 )
 
-func HelpCmd(stream io.Writer, name string, args []string) {
+func HelpCmd(stream io.Writer, name string, args []string, session ssh.Session) {
 	utils.AddText(stream, fmt.Sprintf("%shttps://daniel.is-a.dev%s\n\nCommands: %s", colors.Yellow, colors.Reset, cmdText))
 }
 
-func AboutMeCmd(stream io.Writer, name string, args []string) {
+func AboutMeCmd(stream io.Writer, name string, args []string, session ssh.Session) {
 	utils.Type(stream, fmt.Sprintf("Who is HackermonDev??? 🤔🤔🤔\n\n"))
 
 	aboutMe, err := api.GetAboutMeDescription()
@@ -63,15 +69,22 @@ func AboutMeCmd(stream io.Writer, name string, args []string) {
 	utils.AddText(stream, "\n\n")
 }
 
-func ClearCmd(stream io.Writer, name string, args []string) {
+func ClearCmd(stream io.Writer, name string, args []string, session ssh.Session) {
 	utils.ClearTerm(stream)
 }
 
-func BlogsCmd(stream io.Writer, name string, args []string) {
+func ExitCmd(stream io.Writer, name string, args []string, session ssh.Session) {
+	utils.AddText(stream, "Bye bye 👋\n")
+  session.Close()
+}
+
+func BlogsCmd(stream io.Writer, name string, args []string, session ssh.Session) {
 	isLoading := true
 
 	utils.AddText(stream, "\n")
 	go func() {
+    // Cool terminal loading spinner
+
 		s := spin.New()
 
 		for {
@@ -79,7 +92,7 @@ func BlogsCmd(stream io.Writer, name string, args []string) {
 				break
 			}
 
-			text := fmt.Sprintf("\r  \033[36mLoading blogs\033[m %s ", s.Next())
+			text := fmt.Sprintf("\r\033[36mLoading blogs\033[m %s ", s.Next())
 
 			utils.AddText(stream, text)
 			time.Sleep(100 * time.Millisecond)
@@ -90,8 +103,9 @@ func BlogsCmd(stream io.Writer, name string, args []string) {
 	blogs, err := api.GetBlogs()
 
 	isLoading = false
+
+  // Clear terminal line
 	utils.AddText(stream, "\033[2K")
-	utils.AddText(stream, "\n")
 
 	if err != nil {
 		log.Println(err)
@@ -131,7 +145,6 @@ func BlogsCmd(stream io.Writer, name string, args []string) {
 			utils.Type(stream, fmt.Sprintf("%s The blog ID you specified was not found. %s", colors.Red, colors.Reset))
 		}
 
-    log.Println(blog.Data)
 		text, err := html2text.FromString(blog.Data, html2text.Options{PrettyTables: true})
 
 		if err != nil {
@@ -142,7 +155,8 @@ func BlogsCmd(stream io.Writer, name string, args []string) {
 			return
 		}
 
-		utils.AddText(stream, fmt.Sprintf(`%s %s %s 
+		utils.AddText(stream, fmt.Sprintf(`
+    %s %s %s 
     --------------------------
     
     %s %s
@@ -156,11 +170,11 @@ func BlogsCmd(stream io.Writer, name string, args []string) {
 
 	var text bytes.Buffer
 
-	text.WriteString("--------------------------\n")
+	text.WriteString("\n--------------------------\n")
 	for i := 0; i < len(blogs); i++ {
 		blog := blogs[i]
 
-		text.WriteString(fmt.Sprintf("%s %s %s \n%s (%s) %s \n\n%s\n%s", colors.Gray, blog.PublishedAt, colors.Reset, colors.Green, strconv.Itoa(blog.Id), blog.Title, blog.Teaser, colors.Reset))
+		text.WriteString(fmt.Sprintf("%s %s %s \n%s (%s) %s \n%s\n%s", colors.Gray, blog.PublishedAt, colors.Green, colors.Green, strconv.Itoa(blog.Id), blog.Title, blog.Teaser, colors.Reset))
 
 		text.WriteString("--------------------------\n")
 	}
@@ -170,7 +184,18 @@ func BlogsCmd(stream io.Writer, name string, args []string) {
 	utils.AddText(stream, text.String())
 }
 
-func RunCommand(stream io.Writer, text string) {
+func EchoCmd(stream io.Writer, name string, args []string, session ssh.Session){ 
+  if len(args) < 1{
+    utils.AddText(stream, "\n")
+    return
+  }
+
+  text := strings.Join(args[1:], " ")
+
+  utils.AddText(stream, fmt.Sprintf("%s\n", text)) 
+}
+
+func RunCommand(stream io.Writer, text string, session ssh.Session) {
 	cmdName := strings.Split(text, " ")[0]
 
 	if cmdName == "" {
@@ -183,7 +208,7 @@ func RunCommand(stream io.Writer, text string) {
 
 	for _, c := range cmds {
 		if c.name == cmdName {
-			c.run(stream, cmdName, cmdArgs)
+			c.run(stream, cmdName, cmdArgs, session)
 
 			foundCommandToRun = true
 			break

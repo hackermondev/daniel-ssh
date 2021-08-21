@@ -34,7 +34,7 @@ type Blog struct{
 }
 
 func GetAboutMeDescription() (string, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/about", BaseAPIURL))
+	resp, err := HTTPClient.Get(fmt.Sprintf("%s/about", BaseAPIURL))
 
 	if err != nil {
 		return "", err
@@ -51,7 +51,7 @@ func GetAboutMeDescription() (string, error) {
 }
 
 func GetBlogs() ([]Blog, error){
- resp, err := http.Get(fmt.Sprintf("%s/blog/api", BaseURL))
+ resp, err := HTTPClient.Get(fmt.Sprintf("%s/blog/api", BaseURL))
 
 	if err != nil {
 		return nil, err

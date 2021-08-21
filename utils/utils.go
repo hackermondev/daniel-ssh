@@ -11,7 +11,8 @@ func Type(w io.Writer, content string ) {
 	chars := strings.Split(content, "")
 
 	for _, c := range chars {
-    time.Sleep(50 * time.Millisecond)
+    
+    time.Sleep(20 * time.Millisecond)
 
     w.Write([]byte(c))
 	}
