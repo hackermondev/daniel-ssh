@@ -75,5 +75,6 @@ func StartServer(port string) {
 func main() {
 	port := "22"
 
+  log.Println("starting ssh server")
 	StartServer(port)
 }
