@@ -12,7 +12,7 @@ make > logs/server.log 2>&1 &
 ./ngrok_bin/ngrok tcp 22 > logs/ngrok.log 2>&1 &
 
 # wait for ngrok tunnel.
-sleep 3
+sleep 5
 
 # get ngrok tunnel
 TUNNEL=$(curl --silent http://127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url')
