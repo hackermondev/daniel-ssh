@@ -12,8 +12,8 @@ import (
 
 	"golang.org/x/term"
 
-  "time"
 	_ "image/png"
+	"time"
 
 	"github.com/qeesung/image2ascii/convert"
 )
@@ -32,7 +32,7 @@ func StartServer(port string) {
 
 		utils.ClearTerm(s)
 
-    // Attempt my logo (assets/hackermon.png) in shell using ascii
+		// Attempt my logo (assets/hackermon.png) in shell using ascii
 		pty, _, _ := s.Pty()
 
 		convertOptions := convert.DefaultOptions
@@ -44,12 +44,12 @@ func StartServer(port string) {
 
 		logoAscii := converter.ImageFile2ASCIIString("assets/hackermon.png", &convertOptions)
 
-    utils.AddText(s, "Loading...\n")
-		utils.AddText(s, logoAscii) 
-    utils.AddText(s, "Loading...\n")
+		utils.AddText(s, "Loading...\n")
+		utils.AddText(s, logoAscii)
+		utils.AddText(s, "Loading...\n")
 
-    time.Sleep(1 * time.Second)
-    utils.ClearTerm(s)
+		time.Sleep(1 * time.Second)
+		utils.ClearTerm(s)
 
 		utils.Type(s, fmt.Sprintf("%sWelcome to %sdaniel.is-a.dev%s! Type %shelp%s to get started.%s\n\n", colors.Green, colors.Yellow, colors.Green, colors.Yellow, colors.Green, colors.Reset))
 
@@ -75,6 +75,6 @@ func StartServer(port string) {
 func main() {
 	port := "22"
 
-  log.Println("starting ssh server")
+	log.Println("starting ssh server")
 	StartServer(port)
 }

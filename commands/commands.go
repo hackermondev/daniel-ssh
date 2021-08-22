@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-  "github.com/gliderlabs/ssh"
+	"github.com/gliderlabs/ssh"
 
 	"sshserver/api"
 	"sshserver/colors"
@@ -33,8 +33,8 @@ var (
 		{"about", AboutMeCmd, ""},
 		{"clear", ClearCmd, ""},
 		{"blogs", BlogsCmd, ""},
-    {"echo", EchoCmd, "<text>"},
-    {"exit", ExitCmd, ""}}
+		{"echo", EchoCmd, "<text>"},
+		{"exit", ExitCmd, ""}}
 
 	cmdText = `
     * help - See all the current commands you can run.
@@ -74,7 +74,7 @@ func ClearCmd(stream io.Writer, name string, args []string, session ssh.Session)
 
 func ExitCmd(stream io.Writer, name string, args []string, session ssh.Session) {
 	utils.AddText(stream, "Bye bye 👋\n")
-  session.Close()
+	session.Close()
 }
 
 func BlogsCmd(stream io.Writer, name string, args []string, session ssh.Session) {
@@ -82,7 +82,7 @@ func BlogsCmd(stream io.Writer, name string, args []string, session ssh.Session)
 
 	utils.AddText(stream, "\n")
 	go func() {
-    // Cool terminal loading spinner
+		// Cool terminal loading spinner
 
 		s := spin.New()
 
@@ -103,7 +103,7 @@ func BlogsCmd(stream io.Writer, name string, args []string, session ssh.Session)
 
 	isLoading = false
 
-  // Clear terminal line
+	// Clear terminal line
 	utils.AddText(stream, "\033[2K")
 
 	if err != nil {
@@ -182,15 +182,15 @@ func BlogsCmd(stream io.Writer, name string, args []string, session ssh.Session)
 	utils.AddText(stream, text.String())
 }
 
-func EchoCmd(stream io.Writer, name string, args []string, session ssh.Session){ 
-  if len(args) < 1{
-    utils.AddText(stream, "\n")
-    return
-  }
+func EchoCmd(stream io.Writer, name string, args []string, session ssh.Session) {
+	if len(args) < 1 {
+		utils.AddText(stream, "\n")
+		return
+	}
 
-  text := strings.Join(args[1:], " ")
+	text := strings.Join(args[1:], " ")
 
-  utils.AddText(stream, fmt.Sprintf("%s\n", text)) 
+	utils.AddText(stream, fmt.Sprintf("%s\n", text))
 }
 
 func RunCommand(stream io.Writer, text string, session ssh.Session) {
