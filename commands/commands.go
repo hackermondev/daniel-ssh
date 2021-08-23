@@ -154,6 +154,7 @@ func BlogsCmd(stream io.Writer, name string, args []string, session ssh.Session)
 			return
 		}
 
+    api.IncreaseBlogCounter(blog.Slug)
 		utils.AddText(stream, fmt.Sprintf(`%s %s %s 
 
 --------------------------

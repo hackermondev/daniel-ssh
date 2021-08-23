@@ -89,3 +89,21 @@ func GetBlogs() ([]Blog, error) {
 
 	return data, nil
 }
+
+func IncreaseBlogCounter(slug string) error {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/blog/%s/increase_counter", BaseURL, slug), nil)
+
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("User-Agent", "daniel-ssh")
+
+	_, err = HTTPClient.Do(req)
+
+	if err != nil {
+		return err
+	}
+
+  return err
+}
